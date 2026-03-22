@@ -44,7 +44,7 @@ function buildOpenEmbed(data) {
       { name: 'UID', value: `\`${safeText(uid)}\``, inline: true },
       { name: 'Nombre', value: safeText(nombre, 'Sin nombre'), inline: true },
       { name: 'Matrícula', value: safeText(matricula, 'Sin matrícula'), inline: true },
-      { name: 'Fecha     /     Hora', value: whenText, inline: false },
+      { name: 'Fecha/Hora', value: whenText, inline: false },
     );
 }
 
@@ -132,9 +132,48 @@ function buildCloseText(data) {
   return lines.join('\n');
 }
 
+function buildCleanEmbed(data) {
+  const {
+    executorTag,
+    executorId,
+    deletedCount,
+    targetChannelName,
+    targetChannelId,
+  } = data;
+
+  return baseEmbed()
+    .setTitle('🧹 LIMPIEZA DE MENSAJES')
+    .addFields(
+      { name: 'Ejecutado por', value: safeText(executorTag, 'Desconocido'), inline: true },
+      { name: 'ID usuario', value: `\`${safeText(executorId, 'N/D')}\``, inline: true },
+      { name: 'Mensajes eliminados', value: `**${safeText(deletedCount, '0')}**`, inline: true },
+      { name: 'Canal', value: `${safeText(targetChannelName, 'Desconocido')} (\`${safeText(targetChannelId, 'N/D')}\`)`, inline: false },
+    );
+}
+
+function buildCleanText(data) {
+  const {
+    executorTag,
+    executorId,
+    deletedCount,
+    targetChannelName,
+    targetChannelId,
+  } = data;
+
+  return [
+    '🧹 LIMPIEZA DE MENSAJES',
+    `Ejecutado por: ${safeText(executorTag, 'Desconocido')}`,
+    `ID usuario: ${safeText(executorId, 'N/D')}`,
+    `Mensajes eliminados: ${safeText(deletedCount, '0')}`,
+    `Canal: ${safeText(targetChannelName, 'Desconocido')} (${safeText(targetChannelId, 'N/D')})`,
+  ].join('\n');
+}
+
 module.exports = {
   buildOpenEmbed,
   buildCloseEmbed,
   buildOpenText,
   buildCloseText,
+  buildCleanEmbed,
+  buildCleanText,
 };
