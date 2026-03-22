@@ -15,6 +15,18 @@ const commands = [
     .setName('sesiones')
     .setDescription('Ver y cerrar sesiones activas (Admin)')
     .toJSON(),
+  new SlashCommandBuilder()
+    .setName('clean')
+    .setDescription('Borra mensajes recientes del canal actual (Admin)')
+    .addIntegerOption((option) =>
+      option
+        .setName('cantidad')
+        .setDescription('Cantidad de mensajes a borrar (1-100)')
+        .setMinValue(1)
+        .setMaxValue(100)
+        .setRequired(true)
+    )
+    .toJSON(),
 ];
 
 const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
@@ -24,7 +36,7 @@ const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
     await rest.put(Routes.applicationGuildCommands(APPLICATION_ID, GUILD_ID), {
       body: commands,
     });
-    console.log('✅ Comandos desplegados (/sesiones).');
+    console.log('✅ Comandos desplegados (/sesiones, /clean).');
   } catch (e) {
     console.error('❌ Error deploy-commands:', e?.message || e);
     process.exit(1);
