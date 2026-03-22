@@ -3,6 +3,8 @@ const {
   buildCloseEmbed,
   buildOpenText,
   buildCloseText,
+  buildCleanEmbed,
+  buildCleanText,
 } = require('./builders');
 
 const { sendWithFallback } = require('./sender');
@@ -47,10 +49,18 @@ function createLogger({ client, logChannelId, useEmbeds = true, fallbackToText =
     });
   }
 
+  async function cleanPerformed(data) {
+    return await post({
+      embed: buildCleanEmbed(data),
+      text: buildCleanText(data),
+    });
+  }
+
   return {
     post,
     sessionOpened,
     sessionClosed,
+    cleanPerformed,
   };
 }
 
