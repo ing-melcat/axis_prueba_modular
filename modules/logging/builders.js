@@ -44,7 +44,7 @@ function buildOpenEmbed(data) {
       { name: 'UID', value: `\`${safeText(uid)}\``, inline: true },
       { name: 'Nombre', value: safeText(nombre, 'Sin nombre'), inline: true },
       { name: 'Matrícula', value: safeText(matricula, 'Sin matrícula'), inline: true },
-      { name: 'Fecha/Hora', value: whenText, inline: false },
+      { name: 'Fecha     /     Hora', value: whenText, inline: false },
     );
 }
 
