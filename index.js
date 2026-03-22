@@ -449,9 +449,58 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+function isAdminInteraction(interaction) {
+  return interaction.memberPermissions?.has(PermissionsBitField.Flags.Administrator);
+}
+
+async function runCleanCommand(interaction) {
+  if (!isAdminInteraction(interaction)) {
+    return interaction.reply({
+      content: 'No tienes permisos.',
+      flags: 64,
+    });
+  }
+
+  const amount = interaction.options.getInteger('cantidad', true);
+  const channel = interaction.channel;
+
+  if (!channel || typeof channel.bulkDelete !== 'function') {
+    return interaction.reply({
+      content: 'Este canal no permite limpieza con /clean.',
+      flags: 64,
+    });
+  }
+
+  await interaction.deferReply({ flags: 64 });
+
+  let deleted = null;
+  try {
+    deleted = await channel.bulkDelete(amount, true);
+  } catch (e) {
+    console.error('❌ clean bulkDelete error:', e?.message || e);
+    return interaction.editReply('No pude borrar mensajes. Revisa permisos del bot y que los mensajes no sean demasiado antiguos.');
+  }
+
+  const deletedCount = deleted?.size || 0;
+
+  await logger.cleanPerformed({
+    executorTag: interaction.user?.tag || interaction.user?.username || 'Desconocido',
+    executorId: interaction.user?.id || '',
+    deletedCount,
+    targetChannelName: channel.name || 'canal',
+    targetChannelId: channel.id || '',
+  }).catch(() => {});
+
+  return interaction.editReply(`🧹 Se eliminaron ${deletedCount} mensaje(s) del canal #${channel.name || 'canal'}.`);
+}
+
 // ===== Admin UI =====
 client.on('interactionCreate', async (interaction) => {
   try {
+    if (interaction.isChatInputCommand() && interaction.commandName === 'clean') {
+      return await runCleanCommand(interaction);
+    }
+
     if (interaction.isChatInputCommand() && interaction.commandName === 'sesiones') {
       if (interaction.channelId !== ADMIN_CHANNEL_ID) {
         return interaction.reply({
