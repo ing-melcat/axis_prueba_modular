@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "deploy-commands": "node deploy-commands.js"
+    "reset-redis": "node reset-redis.js"
   },
   "dependencies": {
     "discord.js": "^14.16.0",
